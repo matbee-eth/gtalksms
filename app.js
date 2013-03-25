@@ -8,15 +8,22 @@ var express = require('express')
   , user = require('./routes/user')
   , http = require('http')
   , path = require('path')
-  , xmpp = require('node-xmpp');
+  , xmpp = require('node-xmpp')
+  , sys = require('sys');
+var smsified = require('smsified');
 
+// var sms = new SMSified('acidhax', 'ahriman');
+// var options = {senderAddress: '6479314607', address: '6472029446', message: 'Hello world from Node.js'};
+// sms.sendMessage(options, function(result) {
+//     sys.log(sys.inspect(result));
+// });
 // Reserved vars
 var connections = [];
 
 var app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 2999);
+  app.set('port', process.env.PORT || 8999);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -51,13 +58,22 @@ var conn = new xmpp.Client({
 conn.on('online', function(){
     console.log('online');
     conn.send(new xmpp.Element('presence'));
-    conn.send(new xmpp.Element('message',
-        { to: "mathieu.gosbee@matbee.com", // to
-            type: 'chat'}).
-            c('body').
-            t('test'));
+    // conn.send(new xmpp.Element('message',
+    //     { to: "mathieu.gosbee@matbee.com", // to
+    //         type: 'chat'}).
+    //         c('body').
+    //         t('test'));
 });
 
 conn.on('error', function(e) {
     console.log(e);
 });
+
+conn.addListener('stanza', function (stanza) {
+  if('error' === stanza.attrs.type) {
+    console.log('[error] ' + stanza.toString());
+  } else if(stanza.is('message')) {
+    console.log(stanza.attrs);
+  }
+});
+
