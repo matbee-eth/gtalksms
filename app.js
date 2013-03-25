@@ -35,14 +35,6 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.get('/users', user.list);
-app.all('/message', function (req, res) {
-  console.log("/message", req.query, req.params, req.body);
-  res.end();
-});
-app.all('/delivery', function (req, res) {
-  console.log("/delivery", req.query, req.params, req.body);
-  res.end();
-});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
@@ -52,8 +44,8 @@ http.createServer(app).listen(app.get('port'), function(){
 * XMPP shit
 */
 var conn = new xmpp.Client({
-    jid         : "mathieu.gosbee@matbee.com",
-    password    : "1namirhA",
+    jid         : "mariam.ayoub@matbee.com",
+    password    : "mariam.ayoub",
     host        : 'talk.google.com',
     port        : 5222
 });
@@ -76,7 +68,7 @@ conn.addListener('stanza', function (stanza) {
   if('error' === stanza.attrs.type) {
     console.log('[error] ' + stanza.toString());
   } else if(stanza.is('message')) {
-    console.log(stanza.attrs);
+    console.log(stanza.attrs, stanza);
   }
 });
 
@@ -86,6 +78,16 @@ conn.addListener('stanza', function (stanza) {
 var nexmo = require('./node_modules/easynexmo/lib/nexmo');
 
 nexmo.initialize("0f72fcfb","ab10fa19");
-nexmo.sendTextMessage("12898471009","19053347011",'Is this working?',function () {
-  console.log(arguments);
+// nexmo.sendTextMessage("12898471009","19053347011",'Is this working?',function () {
+//   console.log(arguments);
+// });
+
+app.all('/message', function (req, res) {
+  console.log("/message", req.query, req.params, req.body);
+  res.end();
+});
+
+app.all('/delivery', function (req, res) {
+  console.log("/delivery", req.query, req.params, req.body);
+  res.end();
 });
