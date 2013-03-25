@@ -11,12 +11,11 @@ var express = require('express')
   , xmpp = require('node-xmpp')
   , sys = require('sys');
 var smsified = require('smsified');
-
-// var sms = new SMSified('acidhax', 'ahriman');
-// var options = {senderAddress: '6479314607', address: '6472029446', message: 'Hello world from Node.js'};
-// sms.sendMessage(options, function(result) {
-//     sys.log(sys.inspect(result));
-// });
+var sms = new SMSified('acidhax', 'ahriman');
+var options = {senderAddress: '6479314607', address: '6472029446', message: 'Hello world from Node.js', notifyURL: 'http://matbee.com:8999/message'};
+sms.sendMessage(options, function(result) {
+    sys.log(sys.inspect(result));
+});
 // Reserved vars
 var connections = [];
 
@@ -40,6 +39,17 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+
+app.get('/message', function (req, res) {
+  req.addListener('data', function(data){
+    var json = JSON.parse(data);
+    var inbound = new InboundMessage(json);
+    sys.puts('Inbound message: ' + inbound.message);
+  });
+
+  res.writeHead(200);
+  res.end();
+});
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
