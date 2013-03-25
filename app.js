@@ -52,7 +52,7 @@ xmpp.on('online', function() {
 xmpp.on('chat', function(from, message) {
   console.log(arguments);
   if (from === "mathieu.gosbee@matbee.com") {
-    nexmo.sendTextMessage("12898471009","16472029446",'Is this working?',function () {
+    nexmo.sendTextMessage("12898471009","16472029446",message,function () {
       console.log(arguments);
     });
   }
