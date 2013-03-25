@@ -15,7 +15,7 @@ var express = require('express')
 // Enter your tropo outbound messaging token below.
 var token = '017cb4ad1de1fb4da5ea41f13da12b8be6bc12afc8139749e192e0e14cd6d6ccb744009260946251330a6914';
 // The message you want to send.
-var msg = encodeURI('This is a test SMS message from Node.js. Tropo - FTW!');
+var msg = encodeURI('is this working?? :(');
 // The number you want to send the SMS message to.
 var number = '16472029446';
 
