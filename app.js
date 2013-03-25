@@ -86,6 +86,6 @@ conn.addListener('stanza', function (stanza) {
 var nexmo = require('./node_modules/easynexmo/lib/nexmo');
 
 nexmo.initialize("0f72fcfb","ab10fa19");
-nexmo.sendTextMessage("12898471009","16472029446",'testing',function () {
+nexmo.sendTextMessage("12898471009","16472029446",'Is this working, lovely?',function () {
   console.log(arguments);
 });
