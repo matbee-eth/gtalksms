@@ -68,7 +68,7 @@ conn.addListener('stanza', function (stanza) {
   if('error' === stanza.attrs.type) {
     console.log('[error] ' + stanza.toString());
   } else if(stanza.is('message')) {
-    console.log(stanza.attrs, stanza);
+    console.log(stanza.attrs, stanza, stanza.getChildText('body'));
   }
 });
 
