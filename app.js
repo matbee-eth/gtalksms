@@ -35,8 +35,13 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.get('/users', user.list);
-app.post('/message', function (req, res) {
-  console.log(req.query, req.params, req.body);
+app.all('/message', function (req, res) {
+  console.log("/message", req.query, req.params, req.body);
+  res.end();
+});
+app.all('/delivery', function (req, res) {
+  console.log("/delivery", req.query, req.params, req.body);
+  res.end();
 });
 
 http.createServer(app).listen(app.get('port'), function(){
@@ -78,3 +83,7 @@ conn.addListener('stanza', function (stanza) {
 /*
 * SMS
 */
+var nexmo = require('easynexmo');
+
+nexmo.initialize("0f72fcfb","ab10fa19");
+nexmo.sendTextMessage("",<TO_NUMBER>,'testing',consolelog);
