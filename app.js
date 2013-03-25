@@ -9,23 +9,8 @@ var express = require('express')
   , http = require('http')
   , path = require('path')
   , xmpp = require('node-xmpp')
-  , sys = require('sys')
-  , tropo = require('tropo-webapi')
-  , tropoSession = require('./node_modules/tropo-webapi/lib/tropo-session.js');
-// Enter your tropo outbound messaging token below.
-var token = '082f98bb1971a04d9d37a10b1530cadb899c3dc01bf52344ac1292b3d5257adcbfa8e35aa4bb38b8f905bc7d';
-// The message you want to send.
-var msg = encodeURI('is this working?? :(');
-// The number you want to send the SMS message to.
-var number = '19053347011';
+  , sys = require('sys');
 
-var session = new tropoSession.TropoSession();
-// Invoke the makeApiCall() method and pass in token, message to send and number to send to.
-session.makeApiCall(token, {msg: msg, number: number, usingNumber: "2898120656"});
-// Write out put to console.
-session.addListener('responseBody', function(response) {
-  console.log(response);
-});
 
 // Reserved vars
 var connections = [];
@@ -50,56 +35,8 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.get('/users', user.list);
-
-app.get('/inbound', function (req, res) {
-  console.log(req.query);
-  res.contentType('application/json');
-  res.send({value: "OK"});
-  var callerID = req.query.msisdn;
-  var serverNumber = req.query.to;
-  var message = req.query.text;
-  console.log(callerID, serverNumber, message);
-});
-
-app.post('/inbound', function (req, res) {
-  console.log(req.body);
-  res.contentType('application/json');
-  var callerID = null;
-  var message = null;
-  var intendedNumber = null;
-  var create = false;
-
-  if (req.body.session) {
-    var info = req.body.session;
-    if (info.parameters && info.parameters.action && info.parameters.action == "create") {
-      create = true;
-      var webapi = new tropo.TropoWebAPI();
-      console.log('INBOUND TROPO MESSAGE: ');
-      var sss = {value: info.parameters.msg}
-      webapi.message(sss, info.parameters.number, false, "TEXT", info.parameters.usingNumber);
-      res.send(TropoJSON(webapi));
-    }
-    else {
-      callerID = info.from.id;
-      message = info.initialText;
-      intendedNumber = info.to.id;
-      reply_id = callerID;
-    }
-
-  }
-  else {
-    callerID = req.body['inboundSMSMessageNotification']['inboundSMSMessage']['senderAddress'];
-    message = req.body['inboundSMSMessageNotification']['inboundSMSMessage']['message'];
-    intendedNumber = req.body['inboundSMSMessageNotification']['inboundSMSMessage']['destinationAddress'];
-    intendedNumber = intendedNumber.substr(6);
-    reply_id = callerID.substr(5);
-  }
-
-  if (!create) {
-    var complete_msg = "Caller: " + reply_id + " -- Msg: " + message;
-    console.log(complete_msg);
-    res.end();
-  }
+app.post('/message', function (req, res) {
+  console.log(req.query, req.params, req.body);
 });
 
 http.createServer(app).listen(app.get('port'), function(){
@@ -138,3 +75,23 @@ conn.addListener('stanza', function (stanza) {
   }
 });
 
+/*
+* SMS
+*/
+var plivo = require('plivo');
+var p = plivo.RestAPI({
+  authId: 'MAOTVKYTI2MDA1MZDINJ',
+  authToken: 'YTJjYzZhYjYwZWYyZDFhNTM3ODYzNzE2ZmQ3ZTMx'
+});
+
+var params = {
+    'src': '2892595865', // Caller Id
+    'dst' : '6472029446', // User Number to Call
+    'text' : "Hi, message from Plivo",
+    'type' : "sms",
+};
+
+p.send_message(params, function (status, response) {
+    console.log('Status: ', status);
+    console.log('API Response:\n', response);
+});
