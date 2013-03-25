@@ -78,20 +78,3 @@ conn.addListener('stanza', function (stanza) {
 /*
 * SMS
 */
-var plivo = require('plivo');
-var p = plivo.RestAPI({
-  authId: 'MAOTVKYTI2MDA1MZDINJ',
-  authToken: 'YTJjYzZhYjYwZWYyZDFhNTM3ODYzNzE2ZmQ3ZTMx'
-});
-
-var params = {
-    'src': '2892595865', // Caller Id
-    'dst' : '6472029446', // User Number to Call
-    'text' : "Hi, message from Plivo",
-    'type' : "sms",
-};
-
-p.send_message(params, function (status, response) {
-    console.log('Status: ', status);
-    console.log('API Response:\n', response);
-});
