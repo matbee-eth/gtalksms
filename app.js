@@ -40,7 +40,7 @@ app.configure('development', function(){
 app.get('/', routes.index);
 app.get('/users', user.list);
 
-app.get('/message', function (req, res) {
+app.all('/message', function (req, res) {
   req.addListener('data', function(data){
     var json = JSON.parse(data);
     var inbound = new InboundMessage(json);
