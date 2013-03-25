@@ -45,6 +45,7 @@ app.all('/message', function (req, res) {
     var json = JSON.parse(data);
     var inbound = new InboundMessage(json);
     sys.puts('Inbound message: ' + inbound.message);
+    console.log(inbound);
   });
 
   res.writeHead(200);
