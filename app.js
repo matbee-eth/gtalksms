@@ -20,10 +20,8 @@ var msg = encodeURI('is this working?? :(');
 var number = '19053347011';
 
 var session = new tropoSession.TropoSession();
-
 // Invoke the makeApiCall() method and pass in token, message to send and number to send to.
-session.makeApiCall(token, {msg: msg, number: number, usingNumber: "2898040379"});
-
+session.makeApiCall(token, {msg: msg, number: number, usingNumber: "2898120656"});
 // Write out put to console.
 session.addListener('responseBody', function(response) {
   console.log(response);
