@@ -13,11 +13,11 @@ var express = require('express')
   , tropo = require('tropo-webapi')
   , tropoSession = require('./node_modules/tropo-webapi/lib/tropo-session.js');
 // Enter your tropo outbound messaging token below.
-var token = '017cb4ad1de1fb4da5ea41f13da12b8be6bc12afc8139749e192e0e14cd6d6ccb744009260946251330a6914';
+var token = '082f98bb1971a04d9d37a10b1530cadb899c3dc01bf52344ac1292b3d5257adcbfa8e35aa4bb38b8f905bc7d';
 // The message you want to send.
 var msg = encodeURI('is this working?? :(');
 // The number you want to send the SMS message to.
-var number = '16472029446';
+var number = '19053347011';
 
 var session = new tropoSession.TropoSession();
 
@@ -52,6 +52,16 @@ app.configure('development', function(){
 
 app.get('/', routes.index);
 app.get('/users', user.list);
+
+app.get('/inbound', function (req, res) {
+  console.log(req.query);
+  res.contentType('application/json');
+  res.send({value: "OK"});
+  var callerID = req.query.msisdn;
+  var serverNumber = req.query.to;
+  var message = req.query.text;
+  console.log(callerID, serverNumber, message);
+});
 
 app.post('/inbound', function (req, res) {
   console.log(req.body);
