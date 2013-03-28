@@ -93,6 +93,8 @@ app.all('/message', function (req, res) {
     if (req.query.msisdn == transport.number) {
       transport.xmpp.send(transport.gtalk, req.query.text);
     }
+
+    cb();
   }, function() {
     res.end();
   });
