@@ -44,8 +44,8 @@ async.waterfall([
 			cb();
 		});
 	}, function(cb) {
-		//ask('Number of transports?', /.+/, function(num) {
-			var iterate = new Array(1);//new Array(parseInt(num, 10));
+		ask('Number of transports?', /.+/, function(num) {
+			var iterate = new Array(parseInt(num, 10));
 			configData.transports = [];
 			async.eachSeries(iterate, function(useless, next) {
 				var transport = {};
@@ -82,7 +82,7 @@ async.waterfall([
 				console.log('ummmm');
 				cb();
 			});
-		//});
+		});
 	}
 ], function(err) {
 
