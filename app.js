@@ -1,15 +1,16 @@
-
 /**
  * Module dependencies.
  */
 
-var express = require('express')
-  , routes = require('./routes')
-  , user = require('./routes/user')
-  , http = require('http')
-  , path = require('path')
-  , xmpp = require('node-xmpp')
-  , sys = require('sys');
+var express = require('express'),
+  routes = require('./routes'),
+  user = require('./routes/user'),
+  http = require('http'),
+  path = require('path'),
+  xmpp = require('simple-xmpp'),
+  sys = require('sys'),
+  config = require('./config'),
+  async = require('async');
 
 
 // Reserved vars
@@ -18,7 +19,7 @@ var connections = [];
 var app = express();
 
 app.configure(function(){
-  app.set('port', process.env.PORT || 8999);
+  app.set('port', config.port || 8999);
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
   app.use(express.favicon());
@@ -40,61 +41,62 @@ http.createServer(app).listen(app.get('port'), function(){
   console.log("Express server listening on port " + app.get('port'));
 });
 
-/*
-* XMPP shit
-*/
-var xmpp = require('simple-xmpp');
+async.each(config.transports, function(transport, cb) {
+  // Connect GTalk
+  var gtalk = new xmpp.SimpleXMPP();
 
-xmpp.on('online', function() {
-    console.log('Yes, I\'m connected!');
+  gtalk.on('online', function() { console.log('Gtalk connected'); });
+  gtalk.on('error', function(err) { console.error('Gtalk error', err); });
+
+  gtalk.on('chat', function(from, message) {
+    if (from === transport.gtalk) {
+      console.log('SENDING', message, 'TO', transport.number, 'FROM', config.nexmoNumber);
+      nexmo.sendTextMessage(config.nexmoNumber, transport.number, message, function () {
+        console.log(arguments);
+      });
+    }
+  });
+
+  gtalk.connect({
+    jid         : transport.email,
+    password    : transport.password,
+    host        : 'talk.google.com',
+    port        : 5222
+  });
+
+  // check for incoming subscription requests
+  gtalk.getRoster();
+
+  transport.xmpp = gtalk;
+
+  /*gtalk.on('subscribe', function(from) {
+    if (from === 'mathieu.gosbee@matbee.com') {
+      gtalk.acceptSubscription(from);
+    }
+    xmpp.subscribe('mathieu.gosbee@matbee.com');
+  });*/
+
 });
 
-xmpp.on('chat', function(from, message) {
-  console.log(arguments);
-  if (from === "mathieu.gosbee@matbee.com") {
-    nexmo.sendTextMessage("12898471009","16472029446",message,function () {
-      console.log(arguments);
-    });
-  }
-});
-
-xmpp.on('error', function(err) {
-    console.error(err);
-});
-
-xmpp.on('subscribe', function(from) {
-  console.log(arguments);
-  if (from === 'mathieu.gosbee@matbee.com') {
-    xmpp.acceptSubscription(from);
-  }
-});
-
-var config = {
-  jid         : "mariam.ayoub@matbee.com",
-  password    : "mariam.ayoub",
-  host        : 'talk.google.com',
-  port        : 5222
-}
-
-xmpp.connect(config);
-
-xmpp.subscribe('mathieu.gosbee@matbee.com');
-// check for incoming subscription requests
-xmpp.getRoster();
 
 /*
 * SMS
 */
 var nexmo = require('./node_modules/easynexmo/lib/nexmo');
 
-nexmo.initialize("0f72fcfb","ab10fa19");
+nexmo.initialize(config.nexmoApiKey, config.nexmoNumber);
 
 app.all('/message', function (req, res) {
   console.log("/message", req.query, req.params, req.body);
-  if (req.query.msisdn == '16472029446') {
-    xmpp.send("mathieu.gosbee@matbee.com", req.query.text);
-  }
-  res.end();
+
+  async.each(config.transports, function(transport, cb) {
+    if (req.query.msisdn == transport.number) {
+      transport.xmpp.send(transport.gtalk, req.query.text);
+    }
+  }, function() {
+    res.end();
+  });
+
 });
 
 app.all('/delivery', function (req, res) {
