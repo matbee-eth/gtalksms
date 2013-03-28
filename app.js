@@ -84,6 +84,7 @@ async.each(config.transports, function(transport, cb) {
 */
 var nexmo = require('./node_modules/easynexmo/lib/nexmo');
 
+console.log('initializing nexmo', config.nexmoApiKey, config.nexmoNumber);
 nexmo.initialize(config.nexmoApiKey, config.nexmoNumber);
 
 app.all('/message', function (req, res) {
